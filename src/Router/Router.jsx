@@ -14,7 +14,6 @@ import Customers from "../Pages/shared/Customers/Customers";
 import CustomerGuarantorAssignForm from "../Pages/shared/Users/CustomerGuarantorAssignForm";
 import CustomerDetails from "../Pages/shared/Customers/CustomerDetails";
 import CustomerCardDetails from "../Pages/shared/Customers/CustomerCardDetails";
-import InstallmentCards from "../Pages/shared/Customers/InstallmentCards";
 import MonthlyInstallmentOverview from "../Pages/shared/MonthlyInstallments/MonthlyInstallmentOverview";
 import UpdateInstallmentCard from "../Pages/shared/Customers/UpdateInstallmentCard";
 import ProductsSummery from "../Pages/shared/Products/ProductsSummery";
@@ -41,6 +40,11 @@ import CashIn from "../Pages/shared/CashMenage/CashIn";
 import CashReport from "../Pages/shared/CashMenage/CashReport";
 import CashOut from "../Pages/shared/CashMenage/CashOut";
 import CompanyProfit from "../Pages/shared/CompanyProfit/CompanyProfit";
+import SalesCards from "../Pages/shared/SalesCards/SalesCards";
+import CreateSalesItem from "../Pages/shared/SalesItems/CreateSalesItems";
+import CreateSalesCards from "../Pages/shared/Customers/CreateInstallmentCards";
+import SalesCardDetails from "../Pages/shared/SalesCards/SalesCardDetails";
+
 
 const routes = createBrowserRouter([
   {
@@ -57,11 +61,7 @@ const routes = createBrowserRouter([
         element: <MainLayout />,
         children: [
           { path: "/", element: <Dashboard /> },
-          { path: "/assign_task", element: <Assign_Tasks /> },
-          {
-            path: "staff/employer_work_record",
-            element: <EmployerWorkSessions />,
-          },
+
           { path: "/all_users", element: <AllUsers /> },
 
           { path: "/customers/all_customer", element: <Customers /> },
@@ -74,21 +74,28 @@ const routes = createBrowserRouter([
             path: "customers/all_customer/customer_details",
             element: <CustomerDetails />,
           },
-
+          //new 
           {
-            path: "customers/installment_cards/card_Details",
-            element: <CustomerCardDetails />,
+            path: "/customers/sales_cards",
+            element: <SalesCards />,
           },
           {
-            path: "/customers/installment_cards",
-            element: <InstallmentCards />,
+            path:"/customers/create_sales_items",
+            element:<CreateSalesItem />
+          },
+                        {
+                path: "/customers/create_sales_cards",
+                element: <CreateSalesCards />,
+              },
+          // ses
+          {
+            path: "customers/installment_cards/card_Details",
+            element: <SalesCardDetails />,
           },
           {
             path: "/customers/monthly_installment_overview",
             element: <MonthlyInstallmentOverview />,
           },
-
-
 
           {
             path: "/customers/monthly_installment_overviews",
@@ -148,9 +155,7 @@ const routes = createBrowserRouter([
             path: "/cash/cash_reports",
             element: <CashReport />,
           },
-          
-          
-          
+
           // {
           //   path: "/inventory/inventory_list",
           //   element: <InventoryList />,
@@ -159,10 +164,10 @@ const routes = createBrowserRouter([
             path: "/inventory/supplier_payments",
             element: <SupplierPayments />,
           },
-{
-                path: "/staff/employer_attendance_logs",
-                element: <EmployerAttendanceLogs />,
-              },
+          {
+            path: "/staff/employer_attendance_logs",
+            element: <EmployerAttendanceLogs />,
+          },
           {
             element: (
               <RoleProtectedRoute allow={["admin", "developer", "manager"]} />
@@ -172,24 +177,17 @@ const routes = createBrowserRouter([
                 path: "/customers/Installment_payments/:cardId",
                 element: <InstallmentPayments />,
               },
-              {
-                path: "/customers/create_installment_cards",
-                element: <CreateInstallmentCards />,
-              },
+
 
               {
                 path: "/customer/create_installment_chart",
                 element: <InstallmentChart />,
               },
-             
-
 
               {
                 path: "/staff/activity",
                 element: <StaffActivity />,
               },
-
-
             ],
           },
           {

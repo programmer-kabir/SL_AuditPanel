@@ -3,7 +3,7 @@ import axios from "axios";
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_LOCALHOST_KEY}/users/users.php`
+      `${import.meta.env.VITE_LOCALHOST_KEYS}/users/users.php`
     );
     return response.data.data;
   } catch (error) {

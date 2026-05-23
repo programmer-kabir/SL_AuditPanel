@@ -12,7 +12,6 @@ import { FaIdCard } from "react-icons/fa";
 const CustomerOrderInfo = ({ currentCard }) => {
   const { users } = useUsers();
   const currenUser = users.find((user) => user.id === currentCard.user_id);
-  // const { customerInstallmentCards } = useCustomerInstallmentCards();
   return (
     <div
       className="group bg-gradient-to-b from-gray-900 to-gray-950

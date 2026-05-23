@@ -11,10 +11,8 @@ import {
   FaStore,
   FaCalculator,
 } from "react-icons/fa";
-import IconInput from "../../../components/IconInput";
-import useUsers from "../../../utils/Hooks/useUsers";
 
-const CreateInstallmentCards = () => {
+const CreateSalesCards = () => {
   const { register, handleSubmit, reset, watch } = useForm();
   const saleType = watch("sale_type", "Installment");
   const { isUsersLoading, users = [], isUsersError } = useUsers();
@@ -280,4 +278,4 @@ const CreateInstallmentCards = () => {
   );
 };
 
-export default CreateInstallmentCards;
+export default CreateSalesCards;

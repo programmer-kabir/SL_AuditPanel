@@ -127,13 +127,19 @@ export const sidebarMenu = [
       },
       {
         label: "Installment Cards",
-        path: "/customers/installment_cards",
+        path: "/customers/sales_cards",
         icon: RiBankCardLine,
         roles: ["admin", "developer", "manager", "staff"],
       },
       {
         label: "Create Installment Cards",
-        path: "/customers/create_installment_cards",
+        path: "/customers/create_sales_cards",
+        icon: RiBankCard2Line,
+        roles: ["admin", "developer", "manager"],
+      },
+      {
+        label: "Create Sales Items",
+        path: "/customers/create_sales_items",
         icon: RiBankCard2Line,
         roles: ["admin", "developer", "manager"],
       },

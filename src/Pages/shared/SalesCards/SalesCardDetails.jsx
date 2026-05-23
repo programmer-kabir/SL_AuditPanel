@@ -47,11 +47,10 @@ const SalesCardDetails = () => {
   const items = salesItems?.filter(
     (i) => String(i.sale_card_id) === String(card?.id)
   );
-console.log(items)
+
   const payments = salesPayments?.filter(
     (p) => String(p.card_id) === String(card?.id)
   );
-
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const [editForm, setEditForm] = useState({});
@@ -463,15 +462,15 @@ console.log(items)
               <tr className="bg-[#0b1833]">
 
                 <th className="p-3 border border-[#0f1d3a]">
-                  Payment Type
+                 Installment
                 </th>
 
                 <th className="p-3 border border-[#0f1d3a]">
-                  Amount
+                    Due Date
                 </th>
 
                 <th className="p-3 border border-[#0f1d3a]">
-                  Due Date
+                 Amount
                 </th>
 
                 <th className="p-3 border border-[#0f1d3a]">
@@ -492,16 +491,16 @@ console.log(items)
                   className="hover:bg-[#0b1833]/60"
                 >
                   <td className="p-3 border border-[#0f1d3a] text-center">
-                    {p.payment_type}
+                    {p.tag}
                   </td>
-
-                  <td className="p-3 border border-[#0f1d3a] text-center">
-                    ৳ {p.payment_amount}
-                  </td>
-
-                  <td className="p-3 border border-[#0f1d3a] text-center">
+  <td className="p-3 border border-[#0f1d3a] text-center">
                     {p.due_date}
                   </td>
+                  <td className="p-3 border border-[#0f1d3a] text-center">
+                    ৳ {p.due_amount}
+                  </td>
+
+                
 
                   <td className="p-3 border border-[#0f1d3a] text-center">
                     {p.paid_date || "-"}

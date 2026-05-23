@@ -12,6 +12,10 @@ import CashYearlyReportSlice from "../Redux/Cash/CashYearlyReportSlice";
 import MobileAnalyticsSlice from '../Redux/MobileInventory/MobileAnalyticsSlice'
 import SupplierPaymentAnalyticsSlice from '../Redux/SupplierPayment/SupplierPaymentAnalyticsSlice'
 import CashReportSlice from '../Redux/Cash/CashReporSlice'
+// 
+import SalesCardSlice from '../Redux/Sales/SalesCardSlice'
+import SalesItemsSlice from '../Redux/Sales/SalesItemsSlice'
+import SalesPaymentsSlice from '../Redux/Sales/SalesPaymentsSlice'
 const store = configureStore({
   reducer: {
     users: UsersSlice,
@@ -23,7 +27,11 @@ const store = configureStore({
     staffTasksCreditPoints: staffTaskPointSlice,
     stockMobiles:MobileAnalyticsSlice,
     supplierPayments:SupplierPaymentAnalyticsSlice,
-    CashReports:CashReportSlice
+    CashReports:CashReportSlice,
+    // 
+    salesCards:SalesCardSlice,
+    salesItems:SalesItemsSlice,
+    salesPayments:SalesPaymentsSlice
   },
 });
 export default store;

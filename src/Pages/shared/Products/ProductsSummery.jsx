@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
 import NoDataFound from "../../../components/NoData/NoDataFound";
 import Loader from "../../../components/Loader/Loader";
 import { MONTHS } from "../../../../public/month";
+import useSalesItems from "../../../utils/Hooks/Sales/useSalesItems";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
 
 const getYMD = (d) => (d ? String(d).slice(0, 10) : "");
 const getYear = (d) => Number(getYMD(d).split("-")[0] || 0);
@@ -14,11 +15,10 @@ const toNum = (v) => {
   return Number.isFinite(n) ? n : 0;
 };
 const ProductsSummery = () => {
-  const {
-    customerInstallmentCards,
-    isCustomerInstallmentsCardsError,
-    isCustomerInstallmentsCardsLoading,
-  } = useCustomerInstallmentCards();
+
+
+  const {salesItems,isSalesItemsError,isSalesItemsLoading} = useSalesItems()
+const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
   const today = new Date().toISOString().split("T")[0];
 
   const [openModal, setOpenModal] = useState(false);
@@ -29,15 +29,15 @@ const ProductsSummery = () => {
   const [selectedYear, setSelectedYear] = useState("");
   const years = useMemo(() => {
     const set = new Set();
-    customerInstallmentCards.forEach((c) => {
+    salesItems.forEach((c) => {
       const y = getYear(c.delivery_date || c.created_at);
       if (y) set.add(y);
     });
     return Array.from(set).sort((a, b) => b - a);
-  }, [customerInstallmentCards]);
+  }, [salesItems]);
 
-  const filteredCards = useMemo(() => {
-    return customerInstallmentCards.filter((c) => {
+  const filterSalesItems = useMemo(() => {
+    return salesItems.filter((c) => {
       const date = c.delivery_date || c.created_at;
       const ymd = getYMD(date);
       if (!ymd) return false;
@@ -68,34 +68,68 @@ const ProductsSummery = () => {
       return dateA - dateB;
     });
   }, [
-    customerInstallmentCards,
+    salesItems,
     filterType,
     selectedDate,
     selectedMonth,
     selectedYear,
   ]);
+ const filterSalesCards = useMemo(() => {
+    return salesCards.filter((c) => {
+      const date = c.delivery_date || c.created_at;
+      const ymd = getYMD(date);
+      if (!ymd) return false;
 
-  if (isCustomerInstallmentsCardsError) return <NoDataFound />;
-  if (isCustomerInstallmentsCardsLoading)
+      const y = getYear(date);
+      const m = getMonth(date);
+
+      if (selectedYear && Number(selectedYear) !== y) return false;
+
+      if (filterType === "daily") {
+        if (!selectedDate) return true;
+        return ymd === selectedDate;
+      }
+
+      if (filterType === "monthly") {
+        if (!selectedMonth) return true;
+        return Number(selectedMonth) === m;
+      }
+
+      if (filterType === "yearly") {
+        return true;
+      }
+
+      return true;
+    }).sort((a, b) => {
+      const dateA = new Date(a.delivery_date);
+      const dateB = new Date(b.delivery_date);
+      return dateA - dateB;
+    });
+  }, [
+    salesCards,
+    filterType,
+    selectedDate,
+    selectedMonth,
+    selectedYear,
+  ]);
+  if (isSalesItemsError) return <NoDataFound />;
+  if (isSalesItemsLoading)
     return (
       <span className="w-full flex items-center justify-center h-screen">
         <Loader />
       </span>
     );
-  const totalPurchase = filteredCards.reduce(
+  const totalPurchase = filterSalesCards.reduce(
     (sum, item) => sum + toNum(item.cost_price),
     0,
   );
 
-  const totalSale = filteredCards.reduce(
+  const totalSale = filterSalesItems.reduce(
     (sum, item) => sum + toNum(item.sale_price),
     0,
   );
 
-  const totalProfit = filteredCards.reduce(
-    (sum, item) => sum + toNum(item.profit),
-    0,
-  );
+  const totalProfit = totalSale-  totalPurchase
 
   return (
     <main>
@@ -228,7 +262,7 @@ const ProductsSummery = () => {
           </thead>
 
           <tbody>
-            {filteredCards.map((item, index) => {
+            {filterSalesItems.map((item, index) => {
               return (
                 <tr key={index} className="border-b border-gray-700">
                   <td className="p-3">{index + 1}</td>
