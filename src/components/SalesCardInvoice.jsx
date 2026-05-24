@@ -161,7 +161,7 @@ const SalesCardInvoice = ({ card, items }) => {
                         <tr key={item.id}>
                           <td className="border p-3">{index + 1}</td>
                           <td className="border p-3">{item.product_name}</td>
-                          <td className="border p-3">{item.mrp}</td>
+                          <td className="border p-3">{item?.qty}</td>
                           <td className="border p-3">{item.sale_price}</td>
                           <td className="border p-3">1</td>
                           <td className="border p-3">{item.sale_price}</td>

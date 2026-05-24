@@ -223,19 +223,12 @@ const SalesCardDetails = () => {
 
   const input =
     "w-full px-3 py-2 rounded-lg bg-[#020617] border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500";
-    const row = card;
+
  const handlePrint = () => {
 const today = new Date().toISOString().slice(0, 10);
-// const profit = profitAnalytics.filter(ap=>ap.card_id===row.card_id)
-// console.log(profit)
+console.log(payments)
 
-const maturityDate = (row?.maturity_date || "").slice(0, 10);
-console.log(row?.maturity_date)
 
-const isMaturityWithdraw =
-  maturityDate && today >= maturityDate;
-console.log(isMaturityWithdraw)
-  if (!row) return;
 
   const bnDigits = (s) =>
     String(s ?? "")
@@ -263,6 +256,13 @@ console.log(isMaturityWithdraw)
   const w = window.open("", "_blank", "width=900,height=650");
   if (!w) return;
 
+const paidPayments = payments?.filter(payment=>payment.status==='Paid')
+const totalPaidAmount = paidPayments?.reduce(
+  (total, payment) =>
+    total + Number(payment.due_amount || 0),
+  0
+);
+const totalDueAmount = card?.sale_price-totalPaidAmount
 const html = `
 <!DOCTYPE html>
 <html>
@@ -391,9 +391,9 @@ const html = `
       <thead>
         <tr>
           <th>#</th>
-          <th>Product</th>
-          <th>MRP</th>
-          <th>Sale Price</th>
+          <th>Product Name</th>
+          <th>Product Prce</th>
+          <th>Qty</th>
           <th>Total</th>
         </tr>
       </thead>
@@ -403,10 +403,10 @@ const html = `
         ${items.map((item,index)=>`
           <tr>
             <td>${index+1}</td>
-            <td>${item.product_name}</td>
-            <td>${item.mrp}</td>
-            <td>${item.sale_price}</td>
-            <td>${item.sale_price}</td>
+            <td>${item?.product_name}</td>
+            <td>${item?.sale_price}</td>
+            <td>${item?.qty}</td>
+            <td>${item?.sale_price}</td>
           </tr>
         `).join("")}
 
@@ -414,50 +414,75 @@ const html = `
 
     </table>
 
-    <div class="summary">
+<div class="summary">
 
-      <div>
-        <span>Product Total</span>
+  <div>
+    <span>Product Total</span>
 
-        <span>
-          ${card?.sale_price - card?.additional_cost} Tk
+    <span>
+      ${card?.sale_price} Tk
+    </span>
+  </div>
+
+  <div>
+    <span>Total</span>
+
+    <span>
+      ${card?.sale_price} Tk
+    </span>
+  </div>
+
+  <div style="
+    margin-top:20px;
+    display:block;
+  ">
+
+    ${paidPayments.map((p)=>`
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        gap:15px;
+        margin-bottom:8px;
+        font-size:14px;
+      ">
+
+        <span style="width:90px">
+          ${p.paid_date}
         </span>
-      </div>
 
-      <div>
-        <span>Additional Cost</span>
-
-        <span>
-          ${card?.additional_cost} Tk
+        <span style="
+          flex:1;
+          text-align:center;
+        ">
+          ${p.tag}
         </span>
-      </div>
 
-      <div>
-        <span>Total</span>
-
-        <span>
-          ${card?.sale_price} Tk
+        <span style="
+          width:70px;
+          text-align:right;
+        ">
+          ৳ ${Number(
+            p.due_amount || 0
+          ).toLocaleString()}
         </span>
+
       </div>
+    `).join("")}
 
-      <div>
-        <span>Down Payment</span>
+  </div>
 
-        <span>
-          ${card?.down_payment} Tk
-        </span>
-      </div>
+  <div style="
+    margin-top:20px;
+    font-weight:bold;
+  ">
+    <strong>Due</strong>
 
-      <div>
-        <strong>Due</strong>
+    <strong>
+      ${totalDueAmount || 0} Tk
+    </strong>
+  </div>
 
-        <strong>
-          ${card?.total_due_amount} Tk
-        </strong>
-      </div>
-
-    </div>
-
+</div>
     <div class="footer">
 
       <div>

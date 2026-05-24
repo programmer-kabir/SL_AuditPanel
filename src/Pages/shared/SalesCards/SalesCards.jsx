@@ -24,6 +24,7 @@ import useUsers from "../../../utils/Hooks/useUsers";
 import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
 const SalesCards = () => {
   const { isSalesCardLoading, salesCards, isSalesCardError } = useSalesCard();
+  console.log(salesCards)
   const { users } = useUsers();
   const { isSalesItemsLoading, isSalesItemsError, salesItems } =
     useSalesItems();
@@ -57,7 +58,6 @@ const SalesCards = () => {
         const cardItems = salesItems?.filter(
           (item) => item?.sale_card_id === card?.id,
         );
-        // ✅ USER MATCH
         const matchedUser = users?.find((user) => user?.id === card?.user_id);
         return (
           <Link
@@ -68,7 +68,6 @@ const SalesCards = () => {
                          p-5 hover:border-blue-500
                          hover:shadow-xl transition-all"
           >
-            {/* Top */}
             <div className="flex items-start justify-between mb-4">
               <div>
                 <p className="text-xs text-gray-400">Card No</p>
@@ -93,7 +92,6 @@ const SalesCards = () => {
             </div>
 
             <div className="mb-4 space-y-1">
-              {/* Products */}
               <div className="">
                 {cardItems?.map((item) => (
                   <div
@@ -107,7 +105,6 @@ const SalesCards = () => {
                 ))}
               </div>
 
-              {/* Sale Type */}
               <div className="text-sm">
                 <span className="text-gray-400">Sale Type:</span>{" "}
                 <span className="text-xs text-white-400 font-medium">
@@ -116,9 +113,7 @@ const SalesCards = () => {
               </div>
             </div>
 
-            {/* Divider */}
 
-            {/* User */}
             <div className="border-t border-gray-800 pt-3 space-y-2 text-sm">
               <div className="flex items-center gap-2 text-gray-300">
                 <User size={18} className="text-gray-400" />
@@ -154,10 +149,7 @@ const SalesCards = () => {
  <div className="mt-auto h-[64px] flex items-end">
 
 
-            {/* Button */}
             <Link
-              // onMouseDown={saveInstallmentCardsScroll}
-              // onTouchStart={saveInstallmentCardsScroll}
               to={`/customer/create_installment_chart?cardId=${card.id}`}
               className="w-full"
             >
