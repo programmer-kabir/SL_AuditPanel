@@ -39,6 +39,8 @@ const SalesCards = () => {
     }, {});
   }, [salesPayments]);
 
+
+
   if (isSalesCardLoading || isSalesItemsLoading) {
     return <div className="text-white text-center py-10">Loading...</div>;
   }
@@ -79,7 +81,7 @@ const SalesCards = () => {
                   ${
                     card.status === "Running"
                       ? " bg-blue-900/30 text-blue-300"
-                      : card.status === "Completed"
+                      : card.status === "Fully Paid"
                         ? "bg-emerald-900/30 text-emerald-300"
                         : "bg-red-900 text-red-300"
                   }
@@ -87,6 +89,7 @@ const SalesCards = () => {
               >
                 {card.status}
               </div>
+            
             </div>
 
             <div className="mb-4 space-y-1">

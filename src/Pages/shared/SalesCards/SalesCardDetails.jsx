@@ -9,6 +9,7 @@ import useUsers from "../../../utils/Hooks/useUsers";
 import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
 import useSalesItems from "../../../utils/Hooks/Sales/useSalesItems";
 import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
+import SalesCardInvoice from "../../../components/SalesCardInvoice";
 
 const Input = ({ label, name, value, onChange }) => (
   <div className="flex flex-col gap-1">
@@ -201,6 +202,9 @@ const SalesCardDetails = () => {
     }
   };
 
+
+
+
   if (
     isSalesCardLoading ||
     isSalesItemsLoading ||
@@ -219,7 +223,267 @@ const SalesCardDetails = () => {
 
   const input =
     "w-full px-3 py-2 rounded-lg bg-[#020617] border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500";
+    const row = card;
+ const handlePrint = () => {
+const today = new Date().toISOString().slice(0, 10);
+// const profit = profitAnalytics.filter(ap=>ap.card_id===row.card_id)
+// console.log(profit)
 
+const maturityDate = (row?.maturity_date || "").slice(0, 10);
+console.log(row?.maturity_date)
+
+const isMaturityWithdraw =
+  maturityDate && today >= maturityDate;
+console.log(isMaturityWithdraw)
+  if (!row) return;
+
+  const bnDigits = (s) =>
+    String(s ?? "")
+      .replaceAll("0", "০")
+      .replaceAll("1", "১")
+      .replaceAll("2", "২")
+      .replaceAll("3", "৩")
+      .replaceAll("4", "৪")
+      .replaceAll("5", "৫")
+      .replaceAll("6", "৬")
+      .replaceAll("7", "৭")
+      .replaceAll("8", "৮")
+      .replaceAll("9", "৯");
+
+  const bnDate = (dateStr) => {
+    // expects YYYY-MM-DD
+    const d = (dateStr || "").slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return bnDigits(d || "");
+    const [y, m, day] = d.split("-");
+    return `${bnDigits(day)}-${bnDigits(m)}-${bnDigits(y)}`;
+  };
+
+  const user = users.find(u=>Number(u.id)===Number(card?.user_id))
+
+  const w = window.open("", "_blank", "width=900,height=650");
+  if (!w) return;
+
+const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Invoice</title>
+
+  <style>
+    @page{
+      size:A4;
+      margin:15mm;
+    }
+
+    body{
+      font-family: Arial, sans-serif;
+      background:#f3f4f6;
+      margin:0;
+      padding:20px;
+    }
+
+    .page{
+      width:210mm;
+      min-height:297mm;
+      background:white;
+      margin:auto;
+      padding:20mm;
+      box-sizing:border-box;
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      border-bottom:1px solid #ccc;
+      padding-bottom:15px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:20px;
+    }
+
+    th,td{
+      border:1px solid #ccc;
+      padding:10px;
+      text-align:left;
+    }
+
+    .summary{
+      width:300px;
+      margin-left:auto;
+      margin-top:30px;
+    }
+
+    .summary div{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+
+    .footer{
+      margin-top:80px;
+      display:flex;
+      justify-content:space-between;
+    }
+
+    @media print{
+      body{
+        background:white;
+        padding:0;
+      }
+ .toolbar{ display:none !important; }
+      .page{
+        margin:0;
+        box-shadow:none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+    <div class="toolbar">
+      <button class="btn" onclick="window.print()">🖨️ Print</button>
+      <button class="btn" onclick="window.print()">⬇️ Save as PDF</button>
+      <button class="btn" onclick="window.close()">✖ Close</button>
+    </div>
+
+  <div class="page">
+
+    <div class="top">
+
+      <div>
+        <h2>সাপ্লাইলিংক বাংলাদেশ লিমিটেড</h2>
+
+        <p>
+          রফিক মঞ্জিল, মঙ্গলকাটা,
+          সুনামগঞ্জ সদর
+        </p>
+
+        <p>01941145876</p>
+      </div>
+
+      <div>
+        <h1>INVOICE</h1>
+
+        <p>Invoice: ${card?.card_id}</p>
+
+        <p>Date: ${card?.delivery_date}</p>
+
+        <p>Status: ${card?.status}</p>
+      </div>
+
+    </div>
+
+    <h3 style="margin-top:30px">
+      Customer Information
+    </h3>
+
+    <p>Name: ${user?.name || ""}</p>
+
+    <p>Phone: ${user?.mobile || ""}</p>
+
+    <p>Address: ${user?.address || ""}</p>
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Product</th>
+          <th>MRP</th>
+          <th>Sale Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        ${items.map((item,index)=>`
+          <tr>
+            <td>${index+1}</td>
+            <td>${item.product_name}</td>
+            <td>${item.mrp}</td>
+            <td>${item.sale_price}</td>
+            <td>${item.sale_price}</td>
+          </tr>
+        `).join("")}
+
+      </tbody>
+
+    </table>
+
+    <div class="summary">
+
+      <div>
+        <span>Product Total</span>
+
+        <span>
+          ${card?.sale_price - card?.additional_cost} Tk
+        </span>
+      </div>
+
+      <div>
+        <span>Additional Cost</span>
+
+        <span>
+          ${card?.additional_cost} Tk
+        </span>
+      </div>
+
+      <div>
+        <span>Total</span>
+
+        <span>
+          ${card?.sale_price} Tk
+        </span>
+      </div>
+
+      <div>
+        <span>Down Payment</span>
+
+        <span>
+          ${card?.down_payment} Tk
+        </span>
+      </div>
+
+      <div>
+        <strong>Due</strong>
+
+        <strong>
+          ${card?.total_due_amount} Tk
+        </strong>
+      </div>
+
+    </div>
+
+    <div class="footer">
+
+      <div>
+        ___________________
+        <br/>
+        Customer Signature
+      </div>
+
+      <div>
+        ___________________
+        <br/>
+        Authorized Signature
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
+`;
+
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+};
   return (
     <div>
       <BackButton />
@@ -289,7 +553,16 @@ const SalesCardDetails = () => {
               >
                 Edit
               </button>
-            </div>
+
+
+<button
+  onClick={handlePrint}
+  className="px-4 py-1 text-xs rounded-full bg-green-600 text-white"
+>
+  Print
+</button>
+<SalesCardInvoice card={card} items={items}/>
+        </div>
           </div>
 
           {/* PRODUCTS */}
