@@ -5,6 +5,7 @@ import Loader from "../../../components/Loader/Loader";
 import { MONTHS } from "../../../../public/month";
 import useSalesItems from "../../../utils/Hooks/Sales/useSalesItems";
 import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
+import useSuppliers from "../../../utils/Hooks/Suppliers/useSuppliers";
 
 const getYMD = (d) => (d ? String(d).slice(0, 10) : "");
 const getYear = (d) => Number(getYMD(d).split("-")[0] || 0);
@@ -19,9 +20,11 @@ const ProductsSummery = () => {
 
   const {salesItems,isSalesItemsError,isSalesItemsLoading} = useSalesItems()
 const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
+const {isSuppliersError,isSuppliersLoading,refetch,suppliers} = useSuppliers()
   const today = new Date().toISOString().split("T")[0];
 
   const [openModal, setOpenModal] = useState(false);
+  const [openMemoTable, setOpenMemoTable] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [filterType, setFilterType] = useState("monthly"); // all | daily | monthly | yearly
   const [selectedDate, setSelectedDate] = useState("");
@@ -112,8 +115,8 @@ const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
     selectedMonth,
     selectedYear,
   ]);
-  if (isSalesItemsError) return <NoDataFound />;
-  if (isSalesItemsLoading)
+  if (isSalesItemsError || isSuppliersError || isSalesCardError) return <NoDataFound />;
+  if (isSalesItemsLoading || isSuppliersLoading || isSalesCardLoading )
     return (
       <span className="w-full flex items-center justify-center h-screen">
         <Loader />
@@ -263,7 +266,15 @@ const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
 
           <tbody>
             {filterSalesItems.map((item, index) => {
+
+                const itemSuppliers = suppliers.filter(
+    (supplier) => Number(supplier.sales_items_id) === Number(item.id)
+  );
+  
+              
               return (
+                <>
+                
                 <tr key={index} className="border-b border-gray-700">
                   <td className="p-3">{index + 1}</td>
                   <td className="p-3 max-w-[200px] break-words whitespace-normal">
@@ -300,21 +311,32 @@ const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
                   </td>
 
                   {/* Memo Image */}
-                  <td className="p-3">
-                    {item.memo ? (
-                      <img
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setOpenModal(true);
-                        }}
-                        src={`https://app.supplylinkbd.com/${item.memo}`}
-                        alt="memo"
-                        className="w-12 h-12 object-cover rounded"
-                      />
-                    ) : (
-                      "-"
-                    )}
-                  </td>
+                 <td className="p-3">
+  {itemSuppliers.length > 0 ? (
+    <button
+      onClick={() =>
+        setOpenMemoTable(
+          openMemoTable === item.id ? null : item.id
+        )
+      }
+      className="px-3 py-1 rounded bg-purple-600 hover:bg-purple-700 text-xs"
+    >
+      View All Memo ({itemSuppliers.length})
+    </button>
+  ) : item.memo ? (
+    <img
+      onClick={() => {
+        setSelectedItem(item);
+        setOpenModal(true);
+      }}
+      src={`https://auditing.supplylinkbd.com/${item.memo}`}
+      alt="memo"
+      className="w-12 h-12 object-cover rounded cursor-pointer"
+    />
+  ) : (
+    "-"
+  )}
+</td>
 
                   {/* Remarks */}
                   <td className="p-3 text-red-400">{item.remarks || "-"}</td>
@@ -330,6 +352,75 @@ const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
                     </button>
                   </td>
                 </tr>
+                {
+  openMemoTable === item.id && (
+    <tr className="bg-gray-900 border-b border-gray-700">
+      <td colSpan={9} className="p-4">
+
+        <table className="w-full text-sm border border-gray-700">
+          <thead className="bg-gray-800">
+            <tr>
+              <th className="p-2 text-start">#</th>
+              <th className="p-2 text-start">Supplier</th>
+              <th className="p-2 text-start">Phone</th>
+              <th className="p-2 text-start">Memo</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {itemSuppliers.map((supplier, idx) => {
+              console.log(itemSuppliers)
+              return(
+              <tr
+                key={idx}
+                className="border-b border-gray-700"
+              >
+                <td className="p-2">{idx + 1}</td>
+
+                <td className="p-2">
+                  {supplier.name || "-"}
+                </td>
+
+                <td className="p-2">
+                  {supplier.phone || "-"}
+                </td>
+
+                <td className="p-2">
+  {supplier.memo_no ? (
+    <div className="flex items-center">
+      <img
+        src={`https://auditing.supplylinkbd.com/${supplier.memo_no}`}
+        alt="memo"
+        onClick={() => {
+          setSelectedItem({
+            ...item,
+            memo: supplier.memo_no,
+            supplier_name: supplier.name,
+            supplier_phone: supplier.phone,
+            purchase_price:supplier?.price,
+            sale_price:"-"
+          });
+
+          setOpenModal(true);
+        }}
+        className="w-20 h-20 min-w-[80px] rounded-lg object-cover cursor-pointer border border-gray-600 hover:scale-105 transition"
+      />
+    </div>
+  ) : (
+    "-"
+  )}
+</td>
+              </tr>
+            )})}
+          </tbody>
+        </table>
+
+      </td>
+    </tr>
+  )
+}
+                </>
+                
               );
             })}
           </tbody>
@@ -360,7 +451,7 @@ const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
               <div className="flex justify-center">
                 {selectedItem.memo ? (
                   <img
-                    src={`https://app.supplylinkbd.com/${selectedItem.memo}`}
+                    src={`https://auditing.supplylinkbd.com/${selectedItem.memo}`}
                     alt="preview"
                     className="rounded border border-gray-700 w-full max-h-[600px]"
                   />

@@ -16,6 +16,8 @@ import CashReportSlice from '../Redux/Cash/CashReporSlice'
 import SalesCardSlice from '../Redux/Sales/SalesCardSlice'
 import SalesItemsSlice from '../Redux/Sales/SalesItemsSlice'
 import SalesPaymentsSlice from '../Redux/Sales/SalesPaymentsSlice'
+import SupplierAnalyticsSlice from '../Redux/Supplier/SupplierAnalyticsSlice'
+
 const store = configureStore({
   reducer: {
     users: UsersSlice,
@@ -31,7 +33,8 @@ const store = configureStore({
     // 
     salesCards:SalesCardSlice,
     salesItems:SalesItemsSlice,
-    salesPayments:SalesPaymentsSlice
+    salesPayments:SalesPaymentsSlice,
+    suppliers:SupplierAnalyticsSlice
   },
 });
 export default store;
