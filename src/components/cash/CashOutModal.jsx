@@ -53,7 +53,7 @@ const handleSubmit = async (e) => {
       const finalSource = isCompanyExpense ? "company-expense" : "";
 
       const res = await axios.post(
-        `${import.meta.env.VITE_LOCALHOST_KEY}/cash/cashOut.php`,
+        `${import.meta.env.VITE_LOCALHOST_KEYS}/cash/get_cash_report.php`,
         {
           ...formData,
           amount: Number(formData.amount),

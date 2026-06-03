@@ -272,14 +272,15 @@ export const InstallmentRow = ({
     try {
       const res = await fetch(
         `${
-          import.meta.env.VITE_LOCALHOST_KEY
-        }/customers/installment_payments_insert.php`,
+          import.meta.env.VITE_LOCALHOST_KEYA
+        }/sales_payments/sales_payments_insert.php`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         },
       );
+      console.log(res)
       const data = await res.json();
       if (data.success) {
         toast.success(
@@ -290,6 +291,7 @@ export const InstallmentRow = ({
         navigate("/customers/installment_cards");
       }
     } catch (err) {
+      console.log(err)
       toast.error("সার্ভার সমস্যা হয়েছে, পরে আবার চেষ্টা করুন");
     }
   };

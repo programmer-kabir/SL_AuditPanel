@@ -49,7 +49,7 @@ const CashInModal = ({ openCashInModal, onClose }) => {
 
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_LOCALHOST_KEY}/cash/cashIn.php`,
+        `${import.meta.env.VITE_LOCALHOST_KEYS}/cash/get_cash_report.php`,
         {
           ...formData,
           amount: Number(formData.amount), 

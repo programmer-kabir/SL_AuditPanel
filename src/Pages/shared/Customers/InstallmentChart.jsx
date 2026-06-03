@@ -10,6 +10,8 @@ import NoDataFound from "../../../components/NoData/NoDataFound";
 import BackButton from "../../../components/BackButton/BackButton";
 import useUsers from "../../../utils/Hooks/useUsers";
 import { useAuth } from "../../../Provider/AuthProvider";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
+import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
 
 const InstallmentChart = () => {
   const { user } = useAuth();
@@ -17,20 +19,15 @@ const InstallmentChart = () => {
   const cardId = searchParams.get("cardId");
   const [showSaveButton, setShowSaveButton] = useState(false);
   const {
-    isCustomerInstallmentsPaymentsLoading,
-    customerInstallmentPayments,
-    isCustomerInstallmentsPaymentsError,
-    refetch
-  } = useCustomerInstallmentPayments();
+isSalesPaymentsError,isSalesPaymentsLoading,salesPayments,refetch
+  } = useSalesPayments();
   const {
-    isCustomerInstallmentsCardsLoading,
-    customerInstallmentCards,
-    isCustomerInstallmentsCardsError,
-  } = useCustomerInstallmentCards();
-  const currentCard = customerInstallmentCards?.find(
+isSalesCardError,isSalesCardLoading,salesCards
+  } = useSalesCard();
+  const currentCard = salesCards?.find(
     (card) => card.id === Number(cardId),
   );
-  const InstallmentPayments = customerInstallmentPayments.filter(
+  const InstallmentPayments = salesPayments?.filter(
     (payment) => payment.card_id === Number(cardId),
   );
 
@@ -43,6 +40,7 @@ const InstallmentChart = () => {
   //   return allowed.includes(users?.role);
   // }, [users]);
   const { users = [] } = useUsers(); // all users
+  console.log(currentCard)
   const userId = currentCard?.user_id;
 
   const isCompanyStaff = useMemo(() => {
@@ -53,9 +51,9 @@ const InstallmentChart = () => {
     return user.roles.some((r) => allowed.includes(r));
   }, [users, userId]);
   const isLoading =
-    isCustomerInstallmentsCardsLoading || isCustomerInstallmentsPaymentsLoading;
+    isSalesCardLoading || isSalesPaymentsLoading;
   const isError =
-    isCustomerInstallmentsCardsError || isCustomerInstallmentsPaymentsError;
+    isSalesCardError || isSalesPaymentsError;
   if (isLoading) {
     return <Loader />;
   }

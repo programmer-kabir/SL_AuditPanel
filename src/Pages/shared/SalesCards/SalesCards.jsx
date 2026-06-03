@@ -24,7 +24,6 @@ import useUsers from "../../../utils/Hooks/useUsers";
 import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
 const SalesCards = () => {
   const { isSalesCardLoading, salesCards, isSalesCardError } = useSalesCard();
-  console.log(salesCards)
   const { users } = useUsers();
   const { isSalesItemsLoading, isSalesItemsError, salesItems } =
     useSalesItems();
@@ -39,8 +38,6 @@ const SalesCards = () => {
       return acc;
     }, {});
   }, [salesPayments]);
-
-
 
   if (isSalesCardLoading || isSalesItemsLoading) {
     return <div className="text-white text-center py-10">Loading...</div>;
@@ -88,7 +85,6 @@ const SalesCards = () => {
               >
                 {card.status}
               </div>
-            
             </div>
 
             <div className="mb-4 space-y-1">
@@ -112,7 +108,6 @@ const SalesCards = () => {
                 </span>
               </div>
             </div>
-
 
             <div className="border-t border-gray-800 pt-3 space-y-2 text-sm">
               <div className="flex items-center gap-2 text-gray-300">
@@ -146,31 +141,43 @@ const SalesCards = () => {
                 </p>
               </div>
             </div>
- <div className="mt-auto h-[64px] flex items-end">
+
+{card.status === "Fully Paid" ? (
+  <div className="mt-3 text-center">
+    <span className="px-3 py-2 rounded-lg bg-green-900/30 text-green-400 text-sm font-semibold">
+      ✓ Payment Completed
+    </span>
+  </div>
+) : (
+   <div className="mt-auto h-[64px] flex items-end">
+    <Link
+      to={`/customer/create_installment_chart?cardId=${card.id}`}
+      className="w-full"
+    >
+      <button
+        className="group w-full flex items-center justify-center gap-2
+        rounded-xl px-4 py-2.5
+        bg-gradient-to-r from-blue-600/90 to-indigo-600/90
+        text-sm font-semibold text-white
+        hover:from-blue-500 hover:to-indigo-500
+        transition-all"
+      >
+        <FaChartLine />
+
+        <span>
+          {paymentCardMap[String(card.id)]
+            ? "Update Installment Chart"
+            : "Create Installment Chart"}
+        </span>
+
+        <FaArrowRight className="group-hover:translate-x-1 transition" />
+      </button>
+    </Link>
+  </div>
+)}
 
 
-            <Link
-              to={`/customer/create_installment_chart?cardId=${card.id}`}
-              className="w-full"
-            >
-              <button
-                className="group w-full flex items-center justify-center gap-2
-                     rounded-xl px-4 py-2.5
-                     bg-gradient-to-r from-blue-600/90 to-indigo-600/90
-                     text-sm font-semibold text-white
-                     hover:from-blue-500 hover:to-indigo-500
-                     transition-all"
-              >
-                <FaChartLine />
-                <span>
-                  {paymentCardMap[String(card.id)]
-                    ? "Update Installment Chart"
-                    : "Create Installment Chart"}
-                </span>
-                <FaArrowRight className="group-hover:translate-x-1 transition" />
-              </button>
-            </Link>
- </div>
+
           </Link>
         );
       })}

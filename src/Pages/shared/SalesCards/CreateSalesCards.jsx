@@ -230,15 +230,18 @@ console.log(data)
         }
       );
 
-      const result = await res.json();
-      if (!result.success) {
-        toast.error(result.message || "Installment create failed");
-        return;
-      }
+const text = await res.text();
+console.log(text)
+// console.log(result)
+//       if (!result.success) {
+//         toast.error(result.message || "Installment create failed");
+//         return;
+//       }
 
       toast.success("Installment Card সফলভাবে তৈরি হয়েছে ✅");
-      reset();
+      // reset();
     } catch (error) {
+      console.log(error)
       toast.error("সার্ভার সমস্যা হয়েছে");
     }
   };

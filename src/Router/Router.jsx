@@ -42,8 +42,10 @@ import CashOut from "../Pages/shared/CashMenage/CashOut";
 import CompanyProfit from "../Pages/shared/CompanyProfit/CompanyProfit";
 import SalesCards from "../Pages/shared/SalesCards/SalesCards";
 import CreateSalesItem from "../Pages/shared/SalesItems/CreateSalesItems";
-import CreateSalesCards from "../Pages/shared/Customers/CreateInstallmentCards";
 import SalesCardDetails from "../Pages/shared/SalesCards/SalesCardDetails";
+import CreateSalesCards from "../Pages/shared/SalesCards/CreateSalesCards";
+import SalesCardInvoicePrint from "../Pages/shared/SalesCards/SalesCardInvoicePrint";
+import InventoryList from "../Pages/shared/MobileInventory/InventoryList";
 
 
 const routes = createBrowserRouter([
@@ -87,6 +89,11 @@ const routes = createBrowserRouter([
                 path: "/customers/create_sales_cards",
                 element: <CreateSalesCards />,
               },
+                        {
+                path: "/customers/sales-card-invoices",
+                element: <SalesCardInvoicePrint />,
+              },
+
           // ses
           {
             path: "customers/installment_cards/card_Details",
@@ -156,10 +163,10 @@ const routes = createBrowserRouter([
             element: <CashReport />,
           },
 
-          // {
-          //   path: "/inventory/inventory_list",
-          //   element: <InventoryList />,
-          // },
+          {
+            path: "/inventory/inventory_list",
+            element: <InventoryList />,
+          },
           {
             path: "/inventory/supplier_payments",
             element: <SupplierPayments />,

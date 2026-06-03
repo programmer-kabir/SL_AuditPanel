@@ -6,6 +6,7 @@ import { MONTHS } from "../../../../public/month";
 import useSalesItems from "../../../utils/Hooks/Sales/useSalesItems";
 import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
 import useSuppliers from "../../../utils/Hooks/Suppliers/useSuppliers";
+import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
 
 const getYMD = (d) => (d ? String(d).slice(0, 10) : "");
 const getYear = (d) => Number(getYMD(d).split("-")[0] || 0);
@@ -22,7 +23,7 @@ const ProductsSummery = () => {
 const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
 const {isSuppliersError,isSuppliersLoading,refetch,suppliers} = useSuppliers()
   const today = new Date().toISOString().split("T")[0];
-
+  const { salesPayments } = useSalesPayments();
   const [openModal, setOpenModal] = useState(false);
   const [openMemoTable, setOpenMemoTable] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -65,10 +66,8 @@ const {isSuppliersError,isSuppliersLoading,refetch,suppliers} = useSuppliers()
       }
 
       return true;
-    }).sort((a, b) => {
-      const dateA = new Date(a.delivery_date);
-      const dateB = new Date(b.delivery_date);
-      return dateA - dateB;
+    }) .sort((a, b) => {
+      return new Date(a.created_at) - new Date(b.created_at);
     });
   }, [
     salesItems,
@@ -115,25 +114,91 @@ const {isSuppliersError,isSuppliersLoading,refetch,suppliers} = useSuppliers()
     selectedMonth,
     selectedYear,
   ]);
-  if (isSalesItemsError || isSuppliersError || isSalesCardError) return <NoDataFound />;
-  if (isSalesItemsLoading || isSuppliersLoading || isSalesCardLoading )
-    return (
-      <span className="w-full flex items-center justify-center h-screen">
-        <Loader />
-      </span>
-    );
-  const totalPurchase = filterSalesCards.reduce(
-    (sum, item) => sum + toNum(item.cost_price),
-    0,
+
+  const monthlyCollectedProfit = salesPayments.reduce((acc, payment) => {
+  const date = payment.paid_date;
+
+  if (!date) return acc;
+
+  const year = getYear(date);
+  const month = getMonth(date);
+
+  const key = `${year}-${month}`;
+
+  acc[key] = (acc[key] || 0) + toNum(payment.profit_amount);
+
+  return acc;
+}, {});
+const collectedProfit = salesPayments
+  .filter((payment) => {
+    const date = payment.paid_date;
+
+    if (!date) return false;
+
+    const y = getYear(date);
+    const m = getMonth(date);
+
+    if (selectedYear && Number(selectedYear) !== y) return false;
+
+    if (filterType === "monthly" && selectedMonth) {
+      return Number(selectedMonth) === m;
+    }
+
+    if (filterType === "daily" && selectedDate) {
+      return getYMD(date) === selectedDate;
+    }
+
+    return true;
+  })
+  .reduce(
+    (sum, payment) => sum + toNum(payment.profit_amount),
+    0
   );
+
+  if (isSalesItemsError || isSuppliersError || isSalesCardError) return <NoDataFound />;
+  // if (isSalesItemsLoading || isSuppliersLoading || isSalesCardLoading )
+  //   return (
+  //     <span className="w-full flex items-center justify-center h-screen">
+  //       <Loader />
+  //     </span>
+  //   );
+
+
+const totalPurchase = filterSalesItems.reduce(
+  (sum, item) =>
+    sum +
+    toNum(item.purchase_price) +
+    toNum(item.additional_cost),
+  0,
+);
 
   const totalSale = filterSalesItems.reduce(
     (sum, item) => sum + toNum(item.sale_price),
     0,
   );
 
-  const totalProfit = totalSale-  totalPurchase
+const totalProfit = filterSalesItems.reduce(
+  (sum, item) =>
+    sum +
+    (
+      toNum(item.sale_price) -
+      (
+        toNum(item.purchase_price) +
+        toNum(item.additional_cost)
+      )
+    ),
+  0
+);
 
+const formatDate = (date) => {
+  if (!date) return "-";
+
+  return new Date(date).toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
   return (
     <main>
       <div className="p-6 min-h-screen text-white">
@@ -246,7 +311,12 @@ const {isSuppliersError,isSuppliersLoading,refetch,suppliers} = useSuppliers()
             </h3>
           </div>
 
-         
+         <div className="bg-gray-800 border border-gray-700 rounded-lg p-5">
+  <p className="text-gray-400 text-sm">আদায়কৃত লাভ</p>
+  <h3 className="text-xl font-bold text-green-400 mt-2">
+    ৳ {collectedProfit.toFixed(2)}
+  </h3>
+</div>
         </div>
 
         <table className="w-full shadow  text-start">
@@ -270,7 +340,7 @@ const {isSuppliersError,isSuppliersLoading,refetch,suppliers} = useSuppliers()
                 const itemSuppliers = suppliers.filter(
     (supplier) => Number(supplier.sales_items_id) === Number(item.id)
   );
-  
+const cost_price=Number(item.purchase_price) + Number(item.additional_cost)
               
               return (
                 <>
@@ -280,26 +350,12 @@ const {isSuppliersError,isSuppliersLoading,refetch,suppliers} = useSuppliers()
                   <td className="p-3 max-w-[200px] break-words whitespace-normal">
                     {item.product_name || "-"}
                   </td>
-                  <td className="p-3 ">
-                    {item.delivery_date || "-"}
-                    {/* {item.description ? (
-                      <p
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setOpenModal(true);
-                        }}
-                        className="cursor-pointer text-gray-300
-                 line-clamp-2 break-words"
-                      >
-                        {item.delivery_date}
-                      </p>
-                    ) : (
-                      "-"
-                    )} */}
-                  </td>
+                  <td className="p-3">
+  {formatDate(item.created_at)}
+</td>
 
                   <td className="p-3">
-                    {item.cost_price ? `৳ ${item.cost_price}` : "-"}
+                    {item.purchase_price ? `৳ ${Number(item.purchase_price) + Number(item.additional_cost)}` : "-"}
                   </td>
 
                   <td className="p-3">
@@ -307,7 +363,7 @@ const {isSuppliersError,isSuppliersLoading,refetch,suppliers} = useSuppliers()
                   </td>
 
                   <td className="p-3 font-semibold text-green-400">
-                    {item?.profit !== "-" ? `৳ ${item?.profit}` : "-"}
+                    {item.profit ? `৳ ${item.profit}` : "-"}
                   </td>
 
                   {/* Memo Image */}

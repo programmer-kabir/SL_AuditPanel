@@ -81,8 +81,9 @@ export const InstallmentRow = ({
     "২৪তম",
   ];
 
-  const costPrice = Number(card?.cost_price || 0);
+  const costPrice = Number(card?.additional_cost) + Number(card?.purchase_price)
   const salePrice = Number(card?.sale_price || 0);
+  
   const baseAmount = Number(card?.per_installment_amount || 0);
 
   /* ================= CORE CALCULATION ================= */
@@ -99,7 +100,7 @@ export const InstallmentRow = ({
   };
 
   /* ================= DOWN PAYMENT ================= */
-  const downPaymentAmount = Number(card?.down_payment || 0);
+  const downPaymentAmount = Number(card?.downpayment || 0);
   const downPaymentCalc = calculatePrincipalProfit(downPaymentAmount);
   /* ================= PRINCIPAL-BASED ADJUSTMENT ================= */
   // principal from base installment
@@ -275,24 +276,29 @@ export const InstallmentRow = ({
     try {
       const res = await fetch(
         `${
-          import.meta.env.VITE_LOCALHOST_KEY
-        }/customers/installment_payments_insert.php`,
+          import.meta.env.VITE_LOCALHOST_KEYS
+        }/sales_payments/sales_payments_insert.php`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         },
       );
-      const data = await res.json();
-      if (data.success) {
-        toast.success(
-          "কিস্তি সংক্রান্ত সকল তথ্য সফলভাবে সিস্টেমে সংরক্ষিত হয়েছে।",
-        );
+const data = await res.json();
 
-        onSaveSuccess?.();
-        navigate("/customers/installment_cards");
-      }
+if (data.success) {
+  toast.success(
+    `সফলভাবে ${data.inserted} টি কিস্তি তৈরি হয়েছে ✅`
+  );
+
+  onSaveSuccess?.();
+  navigate("/customers/installment_cards");
+} else {
+  toast.error(data.message);
+}
+
     } catch (err) {
+      console.log(err)
       toast.error("সার্ভার সমস্যা হয়েছে, পরে আবার চেষ্টা করুন");
     }
   };
@@ -408,7 +414,7 @@ const handleEarlyClose = () => {
 
 
       // ================= BACKEND CALL =================
-      await fetch(`${import.meta.env.VITE_LOCALHOST_KEY}/customers/installment_full_close.php`, {
+      await fetch(`${import.meta.env.VITE_LOCALHOST_KEYS}/sales_payments/sales_payemnts_full_close.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

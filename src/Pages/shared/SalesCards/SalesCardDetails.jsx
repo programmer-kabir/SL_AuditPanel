@@ -226,7 +226,6 @@ const SalesCardDetails = () => {
 
  const handlePrint = () => {
 const today = new Date().toISOString().slice(0, 10);
-console.log(payments)
 
 
 
@@ -678,7 +677,7 @@ const html = `
                 </p>
 
                 <p>
-                  ৳ {card.cost_price}
+                  ৳ {Number(card.purchase_price) + Number(card?.additional_cost)}
                 </p>
               </div>
 
@@ -708,7 +707,7 @@ const html = `
                 </p>
 
                 <p>
-                  ৳ {card.down_payment}
+                  ৳ {card.downpayment}
                 </p>
               </div>
 
@@ -718,7 +717,7 @@ const html = `
                 </p>
 
                 <p>
-                  ৳ {card.total_due_amount}
+                  ৳ {Number(card.sale_price) - Number(card.downpayment)} 
                 </p>
               </div>
 
