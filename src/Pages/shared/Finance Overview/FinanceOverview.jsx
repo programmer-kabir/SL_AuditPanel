@@ -5,6 +5,9 @@ import Loader from "../../../components/Loader/Loader";
 import { FinanceModal } from "./FinanceModal";
 import useUsers from "../../../utils/Hooks/useUsers";
 import useCompanyExpenses from "../../../utils/Hooks/Expenses/useCompanyExpenses";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
+import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
+import useSalesItems from "../../../utils/Hooks/Sales/useSalesItems";
 
 /* ---------- helpers ---------- */
 const toNum = (v) => {
@@ -85,40 +88,22 @@ const Section = ({ title, hint, children }) => (
 );
 
 const FinanceOverview = () => {
-  const {
-    isCustomerInstallmentsCardsLoading,
-    customerInstallmentCards,
-    isCustomerInstallmentsCardsError,
-  } = useCustomerInstallmentCards();
+  const { isSalesCardError, isSalesCardLoading, salesCards } = useSalesCard();
+const {isSalesItemsError,salesItems,isSalesItemsLoading} = useSalesItems()
+  const { isSalesPaymentsError, isSalesPaymentsLoading, salesPayments } =
+    useSalesPayments();
 
-  const {
-    isCustomerInstallmentsPaymentsLoading,
-    customerInstallmentPayments,
-    isCustomerInstallmentsPaymentsError,
-  } = useCustomerInstallmentPayments();
-
-;
-
-
-  const { users, isUsersError, isUsersLoading } = useUsers();
   const { companyExpenses, isCompanyExpensesError, isCompanyExpensesLoading } =
     useCompanyExpenses();
-  const loading =
-    isCustomerInstallmentsCardsLoading ||
-    isCustomerInstallmentsPaymentsLoading ||
-    
-    isUsersLoading ||
-    isCompanyExpensesLoading ;
-  const hasError =
-    isCustomerInstallmentsCardsError ||
-    isCustomerInstallmentsPaymentsError ||
+  const loading = isSalesCardLoading || isSalesPaymentsLoading;
+   isCompanyExpensesLoading;
+  const hasError = isSalesPaymentsError || isSalesCardError;
 
+  isCompanyExpensesError;
 
-    isUsersError ||
-    isCompanyExpensesError ;
-
-  const cards = customerInstallmentCards || [];
-  const payments = customerInstallmentPayments || [];
+  const cards = salesCards || [];
+  const items  = salesItems || [];
+  const payments = salesPayments || [];
   const Expenses = companyExpenses || [];
   /* ---------- metrics ---------- */
   const {
@@ -136,16 +121,31 @@ const FinanceOverview = () => {
     currentCash,
     totalCompanyExpenses,
   } = useMemo(() => {
-    const totalCostPrice = cards.reduce(
-      (sum, c) => sum + toNum(c.cost_price),
-      0,
-    );
+
+const totalCostPrice = salesItems.reduce(
+  (sum, c) =>
+    sum +
+    toNum(c.purchase_price) +
+    toNum(c.additional_cost),
+  0
+);
+
     const totalSalePrice = cards.reduce(
       (sum, c) => sum + toNum(c.sale_price),
       0,
     );
-    const totalProfit = cards.reduce((sum, c) => sum + toNum(c.profit), 0);
-
+const totalProfit = items.reduce(
+  (sum, item) =>
+    sum +
+    (
+      toNum(item.sale_price) -
+      (
+        toNum(item.purchase_price) +
+        toNum(item.additional_cost)
+      )
+    ),
+  0
+);
     // paid_date based collected (safe)
     const totalDuePaid = payments.reduce(
       (sum, p) => (p.paid_date ? sum + toNum(p.due_amount) : sum),
@@ -176,17 +176,12 @@ const FinanceOverview = () => {
       0,
     );
 
-
-
     const totalCompanyExpenses = Expenses.reduce(
       (sum, r) => sum + toNum(r.amount),
       0,
     );
 
-    const currentCash =
-      totalDuePaid -
-      totalCostPrice -
-      totalCompanyExpenses;
+    const currentCash = totalDuePaid - totalCostPrice - totalCompanyExpenses;
     return {
       totalCostPrice,
       totalSalePrice,
@@ -202,11 +197,7 @@ const FinanceOverview = () => {
       currentCash,
       totalCompanyExpenses,
     };
-  }, [cards, payments,  Expenses]);
-
-
-
-
+  }, [cards, payments, Expenses,items]);
 
   if (loading) {
     return (
@@ -350,13 +341,8 @@ const FinanceOverview = () => {
 
         {/* Investment & Cash */}
         <div className="mt-6">
-          <Section
-            title=" Cash"
-            hint="cash"
-          >
+          <Section title=" Cash" hint="cash">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-           
-             
               <StatCard
                 title="Current Cash"
                 subtitle="Collected Sale - Cost - Total Company Expenses"
@@ -368,7 +354,6 @@ const FinanceOverview = () => {
           </Section>
         </div>
       </div>
-
     </main>
   );
 };

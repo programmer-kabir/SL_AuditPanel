@@ -224,7 +224,17 @@ const SalesCardInvoicePrint = () => {
 
   color:#000;
 }
+.page{
+  min-height:95vh;
+  display:flex;
+  flex-direction:column;
+}
 
+.footer{
+  margin-top:auto;
+  display:flex;
+  justify-content:space-between;
+}
 
 @media print {
   * {
@@ -273,7 +283,7 @@ ${selectedInvoices
 
     const totalDueAmount =
       Number(card.sale_price || 0) - Number(totalPaidAmount || 0);
-    const footerMarginTop = paidPayments.length > 8 ? 40 : 240;
+    const footerMarginTop = paidPayments.length > 8 ? 40 : 200;
     return `
     <div class="page">
   <div class="top">
@@ -332,10 +342,22 @@ ${selectedInvoices
       Customer Information
     </h3>
 
-    <p>Name: ${user?.name || ""}</p>
-    <p>Phone: ${user?.mobile || ""}</p>
+    <p style="
+    font-size: 15px;
+    margin: 0;
+    line-height: 1.4;
+  ">নাম: ${user?.name || ""}</p>
+    <p style="
+    font-size: 15px;
+    margin: 0;
+    line-height: 1.4;
+  ">ফোন: ${user?.mobile || ""}</p>
 
-    <p>Address: ${user?.address || ""}</p>
+    <p style="
+    font-size: 15px;
+    margin: 0;
+    line-height: 1.4;
+  ">ঠিকানা : ${user?.address || ""}</p>
 
  <table>
   <thead>
@@ -438,11 +460,7 @@ ${selectedInvoices
 
 
 
- <div class="footer"  style="
-    margin-top:${footerMarginTop}px;
-    display:flex;
-    justify-content:space-between;
-  ">
+ <div class="footer"  >
 
       <div>
         ___________________

@@ -46,6 +46,7 @@ import SalesCardDetails from "../Pages/shared/SalesCards/SalesCardDetails";
 import CreateSalesCards from "../Pages/shared/SalesCards/CreateSalesCards";
 import SalesCardInvoicePrint from "../Pages/shared/SalesCards/SalesCardInvoicePrint";
 import InventoryList from "../Pages/shared/MobileInventory/InventoryList";
+import ProfitReport from "../Pages/shared/Profit/ProfitReport";
 
 
 const routes = createBrowserRouter([
@@ -128,6 +129,10 @@ const routes = createBrowserRouter([
           {
             path: "/company_expenses",
             element: <CompanyExpenses />,
+          },
+          {
+            path: "/profit_reports",
+            element: <ProfitReport />,
           },
           {
             path: "/add_roles",

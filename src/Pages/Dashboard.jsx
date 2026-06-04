@@ -65,9 +65,6 @@ const Dashboard = () => {
 
     return isPaid && isMatchedDate;
   });
-  const filteredInvestments = investInstallments?.filter((i) =>
-    matchDate(i.investment_date),
-  );
 
   const filteredDailyInstallments = dailyInstallments?.filter((d) =>
     matchDate(d.date),
@@ -135,10 +132,9 @@ const Dashboard = () => {
 
   return (
     <>
-<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 mt-4 pb-7">
+<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-4 pb-7">
   <StateCardCopy title="Total Users" value={roleStats.total} />
   <StateCardCopy title="Customers" value={roleStats.customer} />
-  <StateCardCopy title="Investors" value={roleStats.investor} />
   <StateCardCopy title="Staff" value={roleStats.staff} />
   <StateCardCopy title="Managers" value={roleStats.manager} />
   <StateCardCopy title="Admins" value={roleStats.admin} />
@@ -157,7 +153,7 @@ const Dashboard = () => {
           setSelectedYear={setSelectedYear}
           yearOptions={yearOptions}
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard title={"Total Sales"} value={totalSalesAmount}/>
           <StatCard
             title={"Total Installments"}
