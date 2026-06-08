@@ -1,7 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
 import UsersSlice from "./Users/UsersSlice";
-import customerInstallmentCardsSlice from "../Redux/Customers/InstallmentCards/InstallmentCardSlice";
-import customerInstallmentPaymentsSlice from "../Redux/Customers/InstallmentPayment/InstallmentPaymentSlice";
 import companyExpensesSlice from "../Redux/Expenses/companyExpensesSlice";
 import staffTaskSlice from "../Redux/Staff/Tasks/staffTaskSlice";
 import staffTaskPointSlice from "../Redux/Staff/StaffPoints/staffTaskPointSlice";
@@ -21,8 +19,6 @@ import SupplierAnalyticsSlice from '../Redux/Supplier/SupplierAnalyticsSlice'
 const store = configureStore({
   reducer: {
     users: UsersSlice,
-    customerInstallmentCards: customerInstallmentCardsSlice,
-    customerInstallmentPayments: customerInstallmentPaymentsSlice,
     companyExpenses: companyExpensesSlice,
     staffTasks: staffTaskSlice,
     CustomerGranter: CustomerGranterSlice,

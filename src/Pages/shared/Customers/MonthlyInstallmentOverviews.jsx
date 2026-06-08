@@ -1,12 +1,12 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import useUsers from "../../../utils/Hooks/useUsers";
-import useCustomerInstallmentPayments from "../../../utils/Hooks/Customers/useCustomerInstallmentPayments";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
 import Loader from "../../../components/Loader/Loader";
 import NoDataFound from "../../../components/NoData/NoDataFound";
 import Pagination from "../../../components/Pagination";
 import { MONTHS } from "../../../../public/month";
+import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
 
 const LS_KEY = "SLStaffInstallmentOverviewFilters_v1";
 
@@ -47,18 +47,10 @@ const MonthlyInstallmentOverviews = () => {
 
   /* ---------------- DATA ---------------- */
   const { users, isUsersLoading, isUsersError } = useUsers();
-  const {
-    customerInstallmentPayments,
-    isCustomerInstallmentsPaymentsError,
-    isCustomerInstallmentsPaymentsLoading,
-    refetch:isInstallmentPaymentRefetch
-  } = useCustomerInstallmentPayments();
-  const {
-    customerInstallmentCards,
-    isCustomerInstallmentsCardsError,
-    isCustomerInstallmentsCardsLoading,
-    refetch:isCardRefetch
-  } = useCustomerInstallmentCards();
+
+  const {salesPayments,isSalesPaymentsError,isSalesPaymentsLoading} = useSalesPayments()
+
+  const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
 
   /* ---------------- CUSTOMERS ---------------- */
   const customers = users || [];
@@ -80,9 +72,9 @@ const MonthlyInstallmentOverviews = () => {
 
   /* ---------------- YEARS (SAFE) ---------------- */
   const years = useMemo(() => {
-    if (!customerInstallmentPayments?.length) return [];
+    if (!salesPayments?.length) return [];
 
-    const validYears = customerInstallmentPayments
+    const validYears = salesPayments
       .map((p) => {
         if (!p.due_date) return null;
         const d = new Date(p.due_date);
@@ -99,7 +91,7 @@ const MonthlyInstallmentOverviews = () => {
     const result = [];
     for (let y = minYear; y <= maxYear; y++) result.push(y);
     return result;
-  }, [customerInstallmentPayments]);
+  }, [salesPayments]);
 
   /* ---------------- CLAMP YEAR/MONTH (IF OUT OF RANGE) ---------------- */
   useEffect(() => {
@@ -139,24 +131,19 @@ const MonthlyInstallmentOverviews = () => {
     const map = {};
     let serial = 1;
 
-    const sortedCards = [...(customerInstallmentCards || [])].sort(
-      (a, b) => Number(a.card_number) - Number(b.card_number),
+    const sortedCards = [...(salesCards || [])].sort(
+      (a, b) => Number(a.card_id) - Number(b.card_id),
     );
 
     sortedCards.forEach((card) => {
-      if (!map[card.card_number]) {
-        map[card.card_number] = serial;
+      if (!map[card.card_id]) {
+        map[card.card_id] = serial;
         serial++;
       }
     });
 
     return map;
-  }, [customerInstallmentCards]);
-// const validCards = useMemo(() => {
-//   return (customerInstallmentCards || []).filter(
-//     (c) => String(c?.remarks).toLowerCase() !== "daily"
-//   );
-// }, [customerInstallmentCards]);
+  }, [salesCards]);
 
 
 
@@ -164,7 +151,7 @@ const MonthlyInstallmentOverviews = () => {
   const reportData = useMemo(() => {
     const rows = [];
 
-    (customerInstallmentPayments || []).forEach((payment) => {
+    (salesPayments || []).forEach((payment) => {
       if (!payment.due_date) return;
 
       const dueDate = new Date(payment.due_date);
@@ -175,9 +162,9 @@ const MonthlyInstallmentOverviews = () => {
 
       if (!isSameMonth) return;
 
-      const card = (customerInstallmentCards || []).find(
+      const card = (salesCards || []).find(
         (c) =>
-          String(c.card_number) === String(payment.card_id) ||
+          String(c.card_id) === String(payment.card_id) ||
           String(c.id) === String(payment.card_id),
       );
 
@@ -187,8 +174,8 @@ if (!customer) return;
       const isPaid = payment.status === "Paid" || payment.paid_date;
 
       rows.push({
-        cardSerial: card ? cardSerialMap[card.card_number] : "-",
-        cardNo: card?.card_number || payment.card_id || "-",
+        cardSerial: card ? cardSerialMap[card.card_id] : "-",
+        cardNo: card?.card_id || payment.card_id || "-",
         customerName: customer?.name || "Unknown",
         phone: customer?.mobile || "-",
         image: customer?.photo || "-",
@@ -215,8 +202,8 @@ if (!customer) return;
     return rows;
   }, [
     customers,
-    customerInstallmentCards,
-    customerInstallmentPayments,
+    salesCards,
+    salesPayments,
     cardSerialMap,
     month,
     year,
@@ -289,12 +276,12 @@ if (!customer) return;
   /* ---------------- LOAD/ERROR ---------------- */
   const isLoading =
     isUsersLoading ||
-    isCustomerInstallmentsCardsLoading ||
-    isCustomerInstallmentsPaymentsLoading;
+    isSalesCardLoading ||
+    isSalesPaymentsLoading;
 
   const isError =
-    isCustomerInstallmentsPaymentsError ||
-    isCustomerInstallmentsCardsError ||
+    isSalesPaymentsError ||
+    isSalesCardError ||
     isUsersError;
 
   if (isLoading)

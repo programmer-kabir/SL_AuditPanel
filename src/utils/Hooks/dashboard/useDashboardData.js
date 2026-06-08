@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import useCustomerInstallmentCards from "../useCustomerInstallmentCards";
-import useCustomerInstallmentPayments from "../Customers/useCustomerInstallmentPayments";
 import useCompanyExpenses from "../Expenses/useCompanyExpenses";
 import useUsers from "../useUsers";
+import useSalesCard from "../Sales/useSalesCards";
+import useSalesPayments from "../Sales/useSalesPayments";
+import useSalesItems from "../Sales/useSalesItems";
 
 const useDashboardData = () => {
   const [dailyInstallments, setDailyInstallments] = useState([]);
@@ -10,19 +11,16 @@ const useDashboardData = () => {
   const [error, setError] = useState(false);
 
   // 🔹 Custom hooks (already fetching data)
-  const {
-    customerInstallmentCards,
-    isCustomerInstallmentsCardsLoading,
-    isCustomerInstallmentsCardsError,
-  } = useCustomerInstallmentCards();
+ 
+
+
+  const {salesCards,isSalesCardError,isSalesCardLoading} = useSalesCard()
+  const {salesItems,isSalesItemsError,isSalesItemsLoading}= useSalesItems()
+
   const { isUsersError, isUsersLoading, users } = useUsers();
-  const {
-    customerInstallmentPayments,
-    isCustomerInstallmentsPaymentsLoading,
-    isCustomerInstallmentsPaymentsError,
-  } = useCustomerInstallmentPayments();
 
 
+const { isSalesPaymentsError,isSalesPaymentsLoading,refetch,salesPayments} = useSalesPayments()
 
   const { companyExpenses, isCompanyExpensesLoading, isCompanyExpensesError } =
     useCompanyExpenses();
@@ -48,18 +46,18 @@ const useDashboardData = () => {
 
   // 🔹 Combined loading state
   const isLoading =
-    isCustomerInstallmentsCardsLoading ||
-    isCustomerInstallmentsPaymentsLoading ||
-    
+    isSalesCardLoading ||
+    isSalesPaymentsLoading ||
+   isSalesItemsLoading || 
     isCompanyExpensesLoading ||
      isUsersLoading||
     loading;
 
   // 🔹 Combined error state
   const isError =
-    isCustomerInstallmentsCardsError ||
-    isCustomerInstallmentsPaymentsError ||
-    
+    isSalesCardError ||
+    isSalesItemsError ||
+    isSalesPaymentsError ||
     isCompanyExpensesError ||
      isUsersError||
     error;
@@ -92,8 +90,9 @@ const roleStats = React.useMemo(() => {
   return stats;
 }, [users]);
   return {
-    customerInstallmentCards,
-    customerInstallmentPayments,
+    salesCards,
+    salesItems,
+    salesPayments,
     companyExpenses,
     dailyInstallments,
     isLoading,

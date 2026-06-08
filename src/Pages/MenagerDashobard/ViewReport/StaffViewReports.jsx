@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { useSearchParams, Navigate, Link } from "react-router-dom";
 import useUsers from "../../../utils/Hooks/useUsers";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
 import Loader from "../../../components/Loader/Loader";
 import NoDataFound from "../../../components/NoData/NoDataFound";
 import BackButton from "../../../components/BackButton/BackButton";
 
 // ✅ MONTHS import করো (পথটা তোমার প্রজেক্ট অনুযায়ী ঠিক করো)
 import { MONTHS } from "../../../../public/month";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
 
 const ALLOWED_ROLES = ["admin", "manager", "staff", "developer"];
 
@@ -79,10 +79,10 @@ const StaffViewReports = () => {
 
   const { users = [], isUsersLoading, isUsersError } = useUsers();
   const {
-    customerInstallmentCards = [],
-    isCustomerInstallmentsCardsLoading,
-    isCustomerInstallmentsCardsError,
-  } = useCustomerInstallmentCards();
+    salesCards = [],
+    isSalesCardLoading,
+    isSalesCardError,
+  } = useSalesCard();
 
 
   // ✅ Filters
@@ -118,10 +118,10 @@ const StaffViewReports = () => {
   // ✅ loading / error first (hooks order ঠিক রাখা)
   const isLoading =
     isUsersLoading ||
-    isCustomerInstallmentsCardsLoading 
+    isSalesCardLoading 
 
   const isError =
-    isUsersError || isCustomerInstallmentsCardsError ;
+    isUsersError || isSalesCardError ;
   const staff = useMemo(
     () => users?.find((u) => Number(u?.id) === staffId),
     [users, staffId]
@@ -129,14 +129,14 @@ const StaffViewReports = () => {
 
   // ✅ Filtered lists
   const filteredCustomerCards = useMemo(() => {
-    return (customerInstallmentCards || []).filter((c) => {
+    return (salesCards || []).filter((c) => {
       if (Number(c?.reference_user_id) !== staffId) return false;
       return matchByMode(
         filterState,
         c?.created_at ?? c?.delivery_date ?? c?.first_installment_date
       );
     });
-  }, [customerInstallmentCards, staffId, filterState]);
+  }, [salesCards, staffId, filterState]);
 
 ;
 

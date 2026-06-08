@@ -63,6 +63,7 @@ const CreateSalesItem = () => {
       const result = JSON.parse(text);
 if (result.success) {
   toast.success(result.message);
+  reset()
 } else {
   toast.error(result.message);
 }

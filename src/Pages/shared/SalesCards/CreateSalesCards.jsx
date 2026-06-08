@@ -21,7 +21,7 @@ const CreateSalesCards = () => {
   useState([]);
   const saleType = watch("sale_type", "Installment");
   const { isUsersLoading, users = [], isUsersError } = useUsers();
-  const {salesItems} = useSalesItems()
+  const {salesItems,refetch} = useSalesItems()
   const officialStaff = useMemo(() => {
     const allowedRoles = ["admin", "manager", "staff", "developer"];
 
@@ -219,7 +219,7 @@ console.log(data)
     product.id
   );
 });
-      // ================= API CALL =================
+// ================= API CALL =================
       const res = await fetch(
         `${
           import.meta.env.VITE_LOCALHOST_KEYS
@@ -231,7 +231,7 @@ console.log(data)
       );
 
 const text = await res.text();
-console.log(text)
+
 // console.log(result)
 //       if (!result.success) {
 //         toast.error(result.message || "Installment create failed");
@@ -239,9 +239,11 @@ console.log(text)
 //       }
 
       toast.success("Installment Card সফলভাবে তৈরি হয়েছে ✅");
-      // reset();
+      setSelectedProducts([]);
+
+      reset();
+      refetch()
     } catch (error) {
-      console.log(error)
       toast.error("সার্ভার সমস্যা হয়েছে");
     }
   };

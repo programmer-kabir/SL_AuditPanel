@@ -1,4 +1,4 @@
-const CustomerCardView = ({ card }) => {
+const CustomerCardView = ({ card,products }) => {
   const downPayment = card.payments.find((p) => Number(p.installment_no) === 0);
   const hasDownPayment = !!downPayment;
 
@@ -60,9 +60,16 @@ const CustomerCardView = ({ card }) => {
         >
           <div className="flex items-center gap-2">
             <span>📦</span>
-            <h3 className="font-semibold text-sm md:text-base">
-              {card.product_name}
-            </h3>
+            <div className="flex flex-wrap gap-2">
+  {products?.map((product) => (
+    <span
+      key={product.id}
+      className="px-2 py-1 text-xs rounded bg-blue-500/20 text-blue-300"
+    >
+      {product.product_name}
+    </span>
+  ))}
+</div>
             <span className="text-xs text-gray-400">
               | কার্ড নম্বর: {card.card_number}
             </span>

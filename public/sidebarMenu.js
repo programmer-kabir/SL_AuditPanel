@@ -325,7 +325,7 @@ export const sidebarMenu = [
       },
       {
         label: "Products Summary",
-        path: "/products_summery",
+        path: "/sales/sales_products_summary",
         icon: FaBoxOpen,
         roles: ["admin", "developer", "manager", "staff"],
       },

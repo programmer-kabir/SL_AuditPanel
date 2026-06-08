@@ -19,8 +19,8 @@ const Dashboard = () => {
 
 
   const {
-    customerInstallmentCards,
-    customerInstallmentPayments,
+    salesItems,
+    salesPayments,
     investInstallments,
     companyExpenses,
     dailyInstallments,
@@ -59,7 +59,7 @@ const Dashboard = () => {
 
     return true;
   };
-  const filteredPayments = customerInstallmentPayments?.filter((p) => {
+  const filteredPayments = salesPayments?.filter((p) => {
     const isPaid = p.status === "Paid";
     const isMatchedDate = matchDate(p.paid_date);
 
@@ -70,8 +70,8 @@ const Dashboard = () => {
     matchDate(d.date),
   );
 
-  const filteredSales = customerInstallmentCards?.filter((c) =>
-    matchDate(c.delivery_date),
+  const filteredSales = salesItems?.filter((c) =>
+    matchDate(c.created_at),
   );
   const filteredExpenses = companyExpenses?.filter((c) =>
     matchDate(c.expense_date),
@@ -96,12 +96,12 @@ const Dashboard = () => {
       MONTHS,
     });
   const salesChart = chartConfig(
-    customerInstallmentCards,
+    salesItems,
     "sale_price",
-    "delivery_date",
+    "created_at",
   );
   const installmentChart = chartConfig(
-    customerInstallmentPayments,
+    salesPayments,
     "due_amount",
     "paid_date",
   );

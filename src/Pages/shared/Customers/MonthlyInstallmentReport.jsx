@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from "react";
 import useUsers from "../../../utils/Hooks/useUsers";
-import useCustomerInstallmentPayments from "../../../utils/Hooks/Customers/useCustomerInstallmentPayments";
 import BackButton from "../../../components/BackButton/BackButton";
 import Loader from "../../../components/Loader/Loader";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
 import { MONTHS } from "../../../../public/month";
 import { useAuth } from "../../../Provider/AuthProvider";
+import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
 
 /* 🔁 yyyy-mm-dd → yy-mm-dd */
 const toYYMMDD = (dateStr) => {
@@ -31,17 +31,11 @@ const userRoles = Array.isArray(user?.role) ? user.role : [user?.role];
 
   const isDeveloper = userRoles.includes("developer");
   const { users, isUsersLoading } = useUsers();
-  const {
-    isCustomerInstallmentsPaymentsLoading,
-    customerInstallmentPayments,
-    isCustomerInstallmentsPaymentsError,
-  } = useCustomerInstallmentPayments();
 
-  const {
-    isCustomerInstallmentsCardsLoading,
-    customerInstallmentCards,
-    isCustomerInstallmentsCardsError,
-  } = useCustomerInstallmentCards();
+
+const {isSalesPaymentsError,isSalesPaymentsLoading,salesPayments} = useSalesPayments()
+const {isSalesCardError,isSalesCardLoading,salesCards} = useSalesCard()
+
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
 
@@ -56,21 +50,21 @@ const userRoles = Array.isArray(user?.role) ? user.role : [user?.role];
   }, [users]);
   const cardsById = useMemo(() => {
     return (
-      customerInstallmentCards?.reduce((acc, c) => {
+      salesCards?.reduce((acc, c) => {
         const cardId = Number(c.id);
         acc[cardId] = {
           card_id: cardId,
-          card_number: c.card_number || "N/A",
+          card_number: c.card_id || "N/A",
           user_id: Number(c.user_id || 0),
         };
         return acc;
       }, {}) || {}
     );
-  }, [customerInstallmentCards]);
+  }, [salesCards]);
   const filteredData = useMemo(() => {
-    if (!customerInstallmentPayments?.length) return [];
+    if (!salesPayments?.length) return [];
 
-    return customerInstallmentPayments
+    return salesPayments
       .filter((p) => (p.paid_date || "").slice(0, 10) === date)
       .map((p) => {
         const cardId = Number(p.card_id || 0);
@@ -99,7 +93,7 @@ const userRoles = Array.isArray(user?.role) ? user.role : [user?.role];
         };
       })
       .sort((a, b) => a.customerId - b.customerId);
-  }, [customerInstallmentPayments, date, cardsById, usersMap]);
+  }, [salesPayments, date, cardsById, usersMap]);
 
   const totalAmount = useMemo(() => {
     return filteredData.reduce((sum, row) => sum + Number(row.amount || 0), 0);
@@ -107,8 +101,8 @@ const userRoles = Array.isArray(user?.role) ? user.role : [user?.role];
 
   if (
     isUsersLoading ||
-    isCustomerInstallmentsPaymentsLoading ||
-    isCustomerInstallmentsCardsLoading
+    isSalesPaymentsLoading ||
+    isSalesCardLoading
   ) {
     return (
       <div className="flex items-center justify-center">

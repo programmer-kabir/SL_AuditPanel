@@ -1,17 +1,17 @@
 import React, { useMemo, useState } from "react";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
 import useUsers from "../../../utils/Hooks/useUsers";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useAuth } from "../../../Provider/AuthProvider";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
 
 const DailyInstallmentsUsers = () => {
   const {
-    isCustomerInstallmentsCardsLoading,
-    customerInstallmentCards,
-    isCustomerInstallmentsCardsError,
-  } = useCustomerInstallmentCards();
+    isSalesCardLoading,
+    salesCards,
+    isSalesCardError,
+  } = useSalesCard();
 
   const { isUsersLoading, users, isUsersError } = useUsers();
   const [search, setSearch] = useState("");
@@ -45,11 +45,10 @@ const hasPermission = user?.role?.some(role =>
     return Object.keys(newErrors).length === 0;
   };
   const DailyInstallmentsCards = useMemo(() => {
-    return (customerInstallmentCards || []).filter(
+    return (salesCards || []).filter(
       (card) => card.remarks === "Daily",
     );
-  }, [customerInstallmentCards]);
-
+  }, [salesCards]);
   // Merge card + customer
   const cardsWithCustomer = useMemo(() => {
     if (!DailyInstallmentsCards || !users) return [];
@@ -147,7 +146,7 @@ if (!hasPermission) {
     }
   };
 
-  if (isCustomerInstallmentsCardsError || isUsersError) {
+  if (isSalesCardError || isUsersError) {
     return <p>Error loading data</p>;
   }
 

@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
 import { useSearchParams, Navigate, Link } from "react-router-dom";
 import useUsers from "../../../utils/Hooks/useUsers";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
 import Loader from "../../../components/Loader/Loader";
 import NoDataFound from "../../../components/NoData/NoDataFound";
 import BackButton from "../../../components/BackButton/BackButton";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
 
 const ALLOWED_ROLES = ["admin", "manager", "staff", "developer"];
 
@@ -42,10 +42,10 @@ const ReferencesUsers = () => {
 
   const { users = [], isUsersLoading, isUsersError } = useUsers();
   const {
-    customerInstallmentCards = [],
-    isCustomerInstallmentsCardsLoading,
-    isCustomerInstallmentsCardsError,
-  } = useCustomerInstallmentCards();
+    salesCards = [],
+    isSalesCardLoading,
+    isSalesCardError,
+  } = useSalesCard();
 
 
   // ✅ parse staffId in memo (safe)
@@ -65,7 +65,7 @@ const ReferencesUsers = () => {
     const set = new Set();
     if (!staffId) return set;
 
-    customerInstallmentCards.forEach((c) => {
+    salesCards.forEach((c) => {
       if (Number(c?.reference_user_id) === staffId) {
         const uid = Number(c?.user_id);
         if (uid) set.add(uid);
@@ -75,7 +75,7 @@ const ReferencesUsers = () => {
 
 
     return set;
-  }, [customerInstallmentCards,  staffId]);
+  }, [salesCards,  staffId]);
 
   // ✅ final users list
   const referredUsers = useMemo(() => {
@@ -88,7 +88,7 @@ const ReferencesUsers = () => {
 
   if (
     isUsersLoading ||
-    isCustomerInstallmentsCardsLoading   ) {
+    isSalesCardLoading   ) {
     return (
       <div className="p-6">
         <Loader />
@@ -98,7 +98,7 @@ const ReferencesUsers = () => {
 
   if (
     isUsersError ||
-    isCustomerInstallmentsCardsError 
+    isSalesCardError 
   ) {
     return (
       <div className="p-6">

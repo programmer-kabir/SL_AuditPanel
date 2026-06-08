@@ -1,9 +1,6 @@
 import React, { useMemo, useState } from "react";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
-import useCustomerInstallmentPayments from "../../../utils/Hooks/Customers/useCustomerInstallmentPayments";
 import Loader from "../../../components/Loader/Loader";
 import { FinanceModal } from "./FinanceModal";
-import useUsers from "../../../utils/Hooks/useUsers";
 import useCompanyExpenses from "../../../utils/Hooks/Expenses/useCompanyExpenses";
 import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
 import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";

@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import useUsers from "../../../utils/Hooks/useUsers";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
 
 const DailyInstallmentsReports = () => {
   const { users } = useUsers();
-  const { customerInstallmentCards } = useCustomerInstallmentCards();
 
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(

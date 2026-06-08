@@ -16,8 +16,6 @@ import CustomerDetails from "../Pages/shared/Customers/CustomerDetails";
 import CustomerCardDetails from "../Pages/shared/Customers/CustomerCardDetails";
 import MonthlyInstallmentOverview from "../Pages/shared/MonthlyInstallments/MonthlyInstallmentOverview";
 import UpdateInstallmentCard from "../Pages/shared/Customers/UpdateInstallmentCard";
-import ProductsSummery from "../Pages/shared/Products/ProductsSummery";
-import SalesProducts from "../Pages/shared/SalesProducts/SalesProducts";
 import CompanyExpenses from "../Pages/shared/CompanyExpenses/CompanyExpenses";
 import AddRoles from "../Pages/shared/Users/AddRoles";
 import FinanceOverview from "../Pages/shared/Finance Overview/FinanceOverview";
@@ -47,6 +45,7 @@ import CreateSalesCards from "../Pages/shared/SalesCards/CreateSalesCards";
 import SalesCardInvoicePrint from "../Pages/shared/SalesCards/SalesCardInvoicePrint";
 import InventoryList from "../Pages/shared/MobileInventory/InventoryList";
 import ProfitReport from "../Pages/shared/Profit/ProfitReport";
+import ProductsSummery from "../Pages/shared/Products/ProductsSummery";
 
 
 const routes = createBrowserRouter([
@@ -118,17 +117,14 @@ const routes = createBrowserRouter([
             path: "/UpdateInstallmentCard",
             element: <UpdateInstallmentCard />,
           },
-          {
-            path: "/products_summery",
-            element: <ProductsSummery />,
-          },
-          {
-            path: "products/sales_products",
-            element: <SalesProducts />,
-          },
+          
           {
             path: "/company_expenses",
             element: <CompanyExpenses />,
+          },
+          {
+            path: "/sales/sales_products_summary",
+            element: <ProductsSummery />,
           },
           {
             path: "/profit_reports",

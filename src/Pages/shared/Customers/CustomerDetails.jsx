@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
-import useCustomerInstallmentPayments from "../../../utils/Hooks/Customers/useCustomerInstallmentPayments";
 import Loader from "../../../components/Loader/Loader";
 import useUsers from "../../../utils/Hooks/useUsers";
 import CustomerCardView from "../../../components/Dashboard/CustomerCardView";
 import BackButton from "../../../components/BackButton/BackButton";
 import useCustomerGranter from "../../../utils/Granters/useCustomerGranter";
 import CustomerDetailsPrintView from "../../../components/Dashboard/Customer/CustomerDetailsPrintView/CustomerDetailsPrintView";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
+import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
+import useSalesItems from "../../../utils/Hooks/Sales/useSalesItems";
 
 const CustomerDetails = () => {
   const [showPrint, setShowPrint] = useState(false);
@@ -17,17 +18,17 @@ const CustomerDetails = () => {
 
   const { users = [], isUsersError, isUsersLoading } = useUsers();
   const user = users.find((u) => Number(u.id) === Number(userId));
-  const {
-    customerInstallmentCards = [],
-    isCustomerInstallmentsCardsError,
-    isCustomerInstallmentsCardsLoading,
-  } = useCustomerInstallmentCards();
+  const { salesItems, isSalesItemsError, isSalesItemsLoading } =
+    useSalesItems();
+
+  const { salesCards, isSalesCardError, isSalesCardLoading } = useSalesCard();
 
   const {
-    customerInstallmentPayments = [],
-    isCustomerInstallmentsPaymentsError,
-    isCustomerInstallmentsPaymentsLoading,
-  } = useCustomerInstallmentPayments();
+    isSalesPaymentsError,
+    isSalesPaymentsLoading,
+    refetch,
+    salesPayments,
+  } = useSalesPayments();
 
   const {
     CustomerGranter = [],
@@ -42,8 +43,8 @@ const CustomerDetails = () => {
   const granter = users.find((u) => Number(u.id) === Number(granterId));
 
   if (
-    isCustomerInstallmentsCardsLoading ||
-    isCustomerInstallmentsPaymentsLoading ||
+    isSalesCardLoading ||
+    isSalesPaymentsLoading ||
     isCustomerGranterLoading ||
     isUsersLoading
   ) {
@@ -55,8 +56,8 @@ const CustomerDetails = () => {
   }
 
   if (
-    isCustomerInstallmentsCardsError ||
-    isCustomerInstallmentsPaymentsError ||
+    isSalesCardError ||
+    isSalesPaymentsError ||
     isCustomerGranterError ||
     isUsersError
   ) {
@@ -76,28 +77,35 @@ const CustomerDetails = () => {
   }
 
   const myCards =
-    customerInstallmentCards.filter(
-      (card) => Number(card.user_id) === Number(user.id),
+    salesCards.filter((card) => Number(card.user_id) === Number(user.id)) || [];
+
+const myCardsWithPayments = myCards.map((card) => {
+  const payments =
+    salesPayments.filter(
+      (payment) => Number(payment.card_id) === Number(card.id),
     ) || [];
 
-  const myCardsWithPayments = myCards.map((card) => {
-    const payments =
-      customerInstallmentPayments.filter(
-        (payment) => Number(payment.card_id) === Number(card.id),
-      ) || [];
+  const products =
+    salesItems.filter(
+      (item) => Number(item.sale_card_id) === Number(card.id)
+    ) || [];
 
-    // ✅ down payment সহ progress (consistent)
-    const downPayment = payments.find((p) => Number(p.installment_no) === 0);
-    const hasDown = !!downPayment;
-    const regular = payments.filter((p) => Number(p.installment_no) > 0);
-    const all = hasDown ? [downPayment, ...regular] : regular;
+  const downPayment = payments.find((p) => Number(p.installment_no) === 0);
+  const hasDown = !!downPayment;
+  const regular = payments.filter((p) => Number(p.installment_no) > 0);
+  const all = hasDown ? [downPayment, ...regular] : regular;
 
-    const paidCount = all.filter((p) => p.status === "Paid").length;
-    const total = Number(card.installment_count) + (hasDown ? 1 : 0);
-    const progress = total ? Math.round((paidCount / total) * 100) : 0;
+  const paidCount = all.filter((p) => p.status === "Paid").length;
+  const total = Number(card.installment_count) + (hasDown ? 1 : 0);
+  const progress = total ? Math.round((paidCount / total) * 100) : 0;
 
-    return { ...card, payments, progress };
-  });
+  return {
+    ...card,
+    payments,
+    products, // 👈 add products
+    progress,
+  };
+});
 
   if (myCardsWithPayments.length === 0) {
     return (
@@ -124,7 +132,7 @@ const CustomerDetails = () => {
         granter={granter}
         cards={sortedCards}
         onClose={() => setShowPrint(false)}
-        minRows={0} 
+        minRows={0}
         users={users}
       />
     );
@@ -160,7 +168,7 @@ const CustomerDetails = () => {
       </div>
 
       {sortedCards.map((card) => (
-        <CustomerCardView user={user} key={card.id} card={card} />
+        <CustomerCardView user={user} key={card.id} card={card}  products={card.products}/>
       ))}
     </div>
   );

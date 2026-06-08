@@ -2,12 +2,12 @@ import "./montly.css";
 import React, { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import useUsers from "../../../utils/Hooks/useUsers";
-import useCustomerInstallmentPayments from "../../../utils/Hooks/Customers/useCustomerInstallmentPayments";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
 import Loader from "../../../components/Loader/Loader";
 import NoDataFound from "../../../components/NoData/NoDataFound";
 import Pagination from "../../../components/Pagination";
 import { MONTHS } from "../../../../public/month";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
+import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
 
 const LS_KEY = "SLStaffInstallmentOverviewFilters_v1";
 
@@ -42,25 +42,25 @@ const MonthlyInstallmentOverview = () => {
 
   /* ---------------- DATA ---------------- */
   const { users, isUsersLoading, isUsersError } = useUsers();
+
+  const { salesCards, isSalesCardError, isSalesCardLoading } = useSalesCard();
+
   const {
-    customerInstallmentPayments,
-    isCustomerInstallmentsPaymentsError,
-    isCustomerInstallmentsPaymentsLoading,
-  } = useCustomerInstallmentPayments();
-  const {
-    customerInstallmentCards,
-    isCustomerInstallmentsCardsError,
-    isCustomerInstallmentsCardsLoading,
-  } = useCustomerInstallmentCards();
+    isSalesPaymentsError,
+    isSalesPaymentsLoading,
+    refetch,
+    salesPayments,
+  } = useSalesPayments();
+
 
   /* ---------------- CUSTOMERS ---------------- */
   const customers = users || [];
 
   /* ---------------- YEARS (SAFE) ---------------- */
   const years = useMemo(() => {
-    if (!customerInstallmentPayments?.length) return [];
+    if (!salesPayments?.length) return [];
 
-    const validYears = customerInstallmentPayments
+    const validYears = salesPayments
       .map((p) => {
         if (!p.due_date) return null;
         const d = new Date(p.due_date);
@@ -77,7 +77,7 @@ const MonthlyInstallmentOverview = () => {
     const result = [];
     for (let y = minYear; y <= maxYear; y++) result.push(y);
     return result;
-  }, [customerInstallmentPayments]);
+  }, [salesPayments]);
 
   /* ---------------- CLAMP YEAR/MONTH (IF OUT OF RANGE) ---------------- */
   useEffect(() => {
@@ -114,7 +114,7 @@ const MonthlyInstallmentOverview = () => {
     const map = {};
     let serial = 1;
 
-    const sortedCards = [...(customerInstallmentCards || [])].sort(
+    const sortedCards = [...(salesCards || [])].sort(
       (a, b) => Number(a.card_number) - Number(b.card_number),
     );
 
@@ -126,13 +126,13 @@ const MonthlyInstallmentOverview = () => {
     });
 
     return map;
-  }, [customerInstallmentCards]);
+  }, [salesCards]);
 
   /* ---------------- REPORT DATA ---------------- */
   const reportData = useMemo(() => {
     const rows = [];
 
-    (customerInstallmentPayments || []).forEach((payment) => {
+    (salesPayments || []).forEach((payment) => {
       if (!payment.due_date) return;
 
       const dueDate = new Date(payment.due_date);
@@ -143,7 +143,7 @@ const MonthlyInstallmentOverview = () => {
 
       if (!isSameMonth) return;
 
-      const card = (customerInstallmentCards || []).find(
+      const card = (salesCards || []).find(
         (c) =>
           String(c.card_number) === String(payment.card_id) ||
           String(c.id) === String(payment.card_id),
@@ -184,8 +184,8 @@ const MonthlyInstallmentOverview = () => {
     return rows;
   }, [
     customers,
-    customerInstallmentCards,
-    customerInstallmentPayments,
+    salesCards,
+    salesPayments,
     cardSerialMap,
     month,
     year,
@@ -237,12 +237,12 @@ const installmentTotal = filteredReportData
   /* ---------------- LOAD/ERROR ---------------- */
   const isLoading =
     isUsersLoading ||
-    isCustomerInstallmentsCardsLoading ||
-    isCustomerInstallmentsPaymentsLoading;
+    isSalesPaymentsLoading ||
+    isSalesCardLoading;
 
   const isError =
-    isCustomerInstallmentsPaymentsError ||
-    isCustomerInstallmentsCardsError ||
+    isSalesCardError ||
+    isSalesPaymentsError ||
     isUsersError;
 
   if (isLoading)

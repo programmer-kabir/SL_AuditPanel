@@ -3,8 +3,6 @@ import CustomerOrderInfo from "../../../components/Chart/CustomerOrderInfo";
 import { InstallmentRow } from "../../../components/Chart/InstallmentRow";
 import { useSearchParams } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
-import useCustomerInstallmentPayments from "../../../utils/Hooks/Customers/useCustomerInstallmentPayments";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
 import Loader from "../../../components/Loader/Loader";
 import NoDataFound from "../../../components/NoData/NoDataFound";
 import BackButton from "../../../components/BackButton/BackButton";

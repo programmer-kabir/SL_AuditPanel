@@ -66,9 +66,7 @@ const {isSuppliersError,isSuppliersLoading,refetch,suppliers} = useSuppliers()
       }
 
       return true;
-    }) .sort((a, b) => {
-      return new Date(a.created_at) - new Date(b.created_at);
-    });
+    }) 
   }, [
     salesItems,
     filterType,
@@ -346,7 +344,7 @@ const cost_price=Number(item.purchase_price) + Number(item.additional_cost)
                 <>
                 
                 <tr key={index} className="border-b border-gray-700">
-                  <td className="p-3">{index + 1}</td>
+                  <td className="p-3">{item.id}</td>
                   <td className="p-3 max-w-[200px] break-words whitespace-normal">
                     {item.product_name || "-"}
                   </td>
@@ -418,6 +416,7 @@ const cost_price=Number(item.purchase_price) + Number(item.additional_cost)
             <tr>
               <th className="p-2 text-start">#</th>
               <th className="p-2 text-start">Supplier</th>
+              <th className="p-2 text-start">Address</th>
               <th className="p-2 text-start">Phone</th>
               <th className="p-2 text-start">Memo</th>
             </tr>
@@ -435,6 +434,9 @@ const cost_price=Number(item.purchase_price) + Number(item.additional_cost)
 
                 <td className="p-2">
                   {supplier.name || "-"}
+                </td>
+                <td className="p-2">
+                  {supplier.address || "-"}
                 </td>
 
                 <td className="p-2">
@@ -487,8 +489,7 @@ const cost_price=Number(item.purchase_price) + Number(item.additional_cost)
       </div>
       {openModal && selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-          <div className="bg-[#1f2428] w-full max-w-4xl rounded-lg shadow-lg overflow-hidden">
-            {/* Header */}
+<div className="bg-[#1f2428] w-full max-w-5xl h-[95vh] rounded-lg shadow-lg overflow-hidden flex flex-col">            {/* Header */}
             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-700">
               <h2 className="text-lg font-semibold text-white">
                 {selectedItem.product_name || "-"} Details

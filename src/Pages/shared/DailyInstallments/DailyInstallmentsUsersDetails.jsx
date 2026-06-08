@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import useUsers from "../../../utils/Hooks/useUsers";
-import useCustomerInstallmentCards from "../../../utils/Hooks/useCustomerInstallmentCards";
-import useCustomerInstallmentPayments from "../../../utils/Hooks/Customers/useCustomerInstallmentPayments";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import BackButton from "../../../components/BackButton/BackButton";
+import useSalesCard from "../../../utils/Hooks/Sales/useSalesCards";
+import useSalesPayments from "../../../utils/Hooks/Sales/useSalesPayments";
   const iconBtn = `
   inline-flex items-center justify-center
   rounded-lg
@@ -26,12 +26,12 @@ const DailyInstallmentsUsersDetails = () => {
   const { id } = useParams();
 
   const { users } = useUsers();
-  const { customerInstallmentCards } = useCustomerInstallmentCards();
-  const { customerInstallmentPayments } = useCustomerInstallmentPayments();
+  const {salesCards} = useSalesCard()
+  const {salesPayments} = useSalesPayments()
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   // 🔥 CURRENT DATA
-  const currentCard = customerInstallmentCards.find(
+  const currentCard = salesCards.find(
     (card) => Number(card.id) === Number(id),
   );
 
@@ -80,7 +80,7 @@ const DailyInstallmentsUsersDetails = () => {
   }, [filteredData]);
   const currentMonth = new Date().getMonth(); // 0-11
   const currentYear = new Date().getFullYear();
-  const currentCardPayments = customerInstallmentPayments?.filter(
+  const currentCardPayments = salesPayments?.filter(
     (card) => Number(card.card_id) === Number(currentCard?.card_number),
   );
   const thisMonthInstallments = useMemo(() => {
